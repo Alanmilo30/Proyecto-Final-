@@ -257,4 +257,24 @@ void	ClonaPalabras(
 
 			/*Para asignar espacios*/
 		} aux[contador] = '\0';
+		/*Numero de elementos en la lista a la Lista de palabras clonadas*/
+		strcpy_s(szPalabrasSugeridas[iNumSugeridas++], aux);
+
+		/*Palabra a clonar palabra al auxiliar*/
+		strcpy_s(aux, szPalabraLeida);
+
+		contador = 0;
+	}
+	//Transposición de los caracteres.
+	for (int i = 0; i < strlen(szPalabraLeida) - 1; i++) {
+		aux[i] = szPalabraLeida[i + 1];
+		aux[i + 1] = szPalabraLeida[i];
+
+		/*Numero de elementos en la lista a la Lista de palabras clonadas*/
+		strcpy_s(szPalabrasSugeridas[iNumSugeridas++], aux);
+		/*Palabra a clonar palabra al auxiliar*/
+		strcpy_s(aux, szPalabraLeida);
+	}
+	strcpy_s(szPalabrasSugeridas[iNumSugeridas++], szPalabraLeida);
+
 }
