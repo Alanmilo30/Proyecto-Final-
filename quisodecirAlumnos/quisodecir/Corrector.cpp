@@ -8,77 +8,131 @@
 	Quiso decir: Programa principal de la aplicacion de la distancia de Levenstein.
 	
 ******************************************************************************************************************/
-
-
 #include "stdafx.h"
 #include <string.h>
+#include <ctype.h>
 #include "corrector.h"
-#define DEPURAR 1
+#define DEPURAR 0
+#include <malloc.h>
 
 //Funciones publicas del proyecto
 /*****************************************************************************************************************
 	DICCIONARIO: Esta funcion crea el diccionario completo
-	char *	szNombre				:	Nombre del archivo de donde se sacaran las palabras del diccionario	
+	char *	szNombre				:	Nombre del archivo de donde se sacaran las palabras del diccionario
 	char	szPalabras[][TAMTOKEN]	:	Arreglo con las palabras completas del diccionario
 	int		iEstadisticas[]			:	Arreglo con el numero de veces que aparecen las palabras en el diccionario
 	int &	iNumElementos			:	Numero de elementos en el diccionario
 ******************************************************************************************************************/
-void	Diccionario			(char *szNombre, char szPalabras[][TAMTOKEN], int iEstadisticas[], int &iNumElementos)
+
+
+void Diccionario(char* szNombre, char szPalabras[][TAMTOKEN], int iEstadisticas[], int& iNumElementos)
 {
 	FILE* fpDicc;
-	char linea[4000];
+	char linea[70000];
 	char palabraDetectada[TAMTOKEN];
-	int i;
-	int indicePD;
 	iNumElementos = 0;
-	// abrir el achivo
+	int indicePD = 0;
+
+	// abrir el archivo
 	if (DEPURAR == 1)
 		printf("%s", szNombre);
 
 	fopen_s(&fpDicc, szNombre, "r");
 	if (fpDicc != NULL)
 	{
-		
 		if (DEPURAR == 1)
 			printf("\nSi lo pude abrir");
 
-		indicePD = 0;
-		while (!feof(fpDicc))
+		while (fgets(linea, sizeof(linea), fpDicc) != NULL)
 		{
-			fgets(linea, sizeof(linea), fpDicc);
-			if (DEPURAR == 1)
-				printf("\n%s\n", linea);
-			for (i = 0; i < strlen(linea); i++)
-			{
+			// Convertir toda la línea a minúsculas
+			for (int i = 0; linea[i] != '\0'; i++) {
+				linea[i] = tolower(linea[i]);
+			}
 
+			int longi = strlen(linea);
+
+			for (int i = 0; i <= longi; i++)
+			{
 				// Detectar una palabra
-				if (linea[i] == ' ')
+				if (linea[i] == ' ' || linea[i] == '\t' || linea[i] == '\n' || linea[i] == '\0')
 				{
-					palabraDetectada[indicePD] = '\0';
-					strcpy_s(szPalabras[iNumElementos], TAMTOKEN, palabraDetectada);
-					iEstadisticas[iNumElementos] = 1;
-					if (DEPURAR == 1)
-						//printf("\np: %s", palabraDetectada);
+					if (indicePD > 0)
+					{
+						palabraDetectada[indicePD] = '\0';
+
+						// Verificar si la palabra ya existe en el arreglo
+						int indiceExistente = -1;
+						for (int j = 0; j < iNumElementos; j++) {
+							if (strcmp(szPalabras[j], palabraDetectada) == 0) {
+								indiceExistente = j;
+								break;
+							}
+						}
+
+						if (indiceExistente != -1) {
+							// La palabra ya existe, actualizar estadísticas
+							iEstadisticas[indiceExistente]++;
+						}
+						else {
+							// La palabra no existe, agregar al arreglo
+							strcpy(szPalabras[iNumElementos], palabraDetectada);
+							iEstadisticas[iNumElementos] = 1;
+							if (DEPURAR == 1)
+								printf("\n%s", palabraDetectada);
+							iNumElementos++;
+						}
+					}
 					indicePD = 0;
-					iNumElementos++;
-					// eliminar los espacios en blanco
-					// tabuladores y saltos de linea consecutivos				
-			    }
+				}
 				else
 				{
-					if (linea[i] != '(' && linea[i] != ')')
+					if (linea[i] != '(' && linea[i] != ')' && linea[i] != ',' && linea[i] != '.')
 					{
-						palabraDetectada[indicePD] = linea[i];
-						indicePD++;
+						if (indicePD < TAMTOKEN - 1) {
+							palabraDetectada[indicePD] = linea[i];
+							indicePD++;
+						}
+						else {
+							// Tratar el desbordamiento de índice
+						}
 					}
 				}
 			}
-			if (DEPURAR == 1)
-				printf("\nNumPalabras: %i\n", iNumElementos);
-
-			// burbujazo
-
 		}
+
+		// Burbujeo (reemplázalo con un método más eficiente si es posible)
+		for (int i = 0; i < iNumElementos - 1; i++) {
+			for (int j = i + 1; j < iNumElementos; j++) {
+				if (strcmp(szPalabras[i], szPalabras[j]) > 0) {
+					char temp[TAMTOKEN];
+					strcpy(temp, szPalabras[i]);
+					strcpy(szPalabras[i], szPalabras[j]);
+					strcpy(szPalabras[j], temp);
+
+					int tempEstadistica = iEstadisticas[i];
+					iEstadisticas[i] = iEstadisticas[j];
+					iEstadisticas[j] = tempEstadistica;
+				}
+			}
+		}
+
+		// Eliminación de duplicados
+		int indiceNuevo = 0;
+		for (int i = 1; i < iNumElementos; i++) {
+			if (strcmp(szPalabras[indiceNuevo], szPalabras[i]) != 0) {
+				// Nueva palabra encontrada
+				indiceNuevo++;
+				strcpy(szPalabras[indiceNuevo], szPalabras[i]);
+				iEstadisticas[indiceNuevo] = iEstadisticas[i];
+			}
+			else {
+				// Palabra duplicada, actualizar estadísticas
+				iEstadisticas[indiceNuevo] += iEstadisticas[i];
+			}
+		}
+
+		iNumElementos = indiceNuevo + 1;
 
 		fclose(fpDicc);
 	}
@@ -88,6 +142,7 @@ void	Diccionario			(char *szNombre, char szPalabras[][TAMTOKEN], int iEstadistic
 			printf("\nNo lo pude abrir");
 	}
 }
+
 
 /*****************************************************************************************************************
 	ListaCandidatas: Esta funcion recupera desde el diccionario las palabras validas y su peso
