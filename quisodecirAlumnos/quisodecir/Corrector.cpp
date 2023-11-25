@@ -215,7 +215,20 @@ void	ClonaPalabras(
 	char	szPalabrasSugeridas[][TAMTOKEN], 	//Lista de palabras clonadas
 	int &	iNumSugeridas)						//Numero de elementos en la lista
 {
-	//Sustituya estas lineas por su código
-	strcpy(szPalabrasSugeridas[0], szPalabraLeida); //lo que sea que se capture, es sugerencia
-	iNumSugeridas = 1;							//Una sola palabra sugerida
+
+	/*Variables para la clonacion*/
+	char aux[TAMTOKEN]; iNumSugeridas = 0;
+
+	/*Pasar de szPalabraLeida al la variable aux*/
+	strcpy_s(aux, szPalabraLeida);
+
+	//Pasar el abecedario en cada caracter
+	for (int i = 0; i < strlen(szPalabraLeida); i++) {
+
+		for (int j = 0; j < LONGITUD; j++) {
+			aux[i] = abecedario[j];
+			/*Numero de elementos en la lista a la Lista de palabras clonadas*/
+			strcpy_s(szPalabrasSugeridas[iNumSugeridas++], aux);
+		} aux[i] = szPalabraLeida[i];
+	}
 }
