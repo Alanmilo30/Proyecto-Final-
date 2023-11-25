@@ -166,12 +166,27 @@ void	ListaCandidatas		(
 	int		iPeso[],							//Peso de las palabras en la lista final
 	int &	iNumLista)							//Numero de elementos en la szListaFinal
 {
+	iNumLista = 0;
+	for (int i = 0; i < iNumSugeridas; i++) {
+		for (int j = 0; j < iNumElementos; j++) {
 
-	//Sustituya estas lineas por su código
-	strcpy(szListaFinal[0], szPalabrasSugeridas[ 0] ); //la palabra candidata
-	iPeso[0] = iEstadisticas[0];			// el peso de la palabra candidata
+			/*Comparar de Lista de palabras del diccionario con la Lista de palabras clonadas */
+			if (strcmp(szPalabrasSugeridas[i], szPalabras[j]) == 0) {
+				/*Declaramos una bandera*/
+				bool bandera = false;
+				for (int k = 0; k < iNumLista && !bandera; k++)
+					/*Comparar de Lista de palabras del diccionario con Lista final de palabras a sugerir*/
+					if (strcmp(szListaFinal[k], szPalabras[j]) == 0)
+						bandera = true;
+				/*Si es verdad <<continuar>>*/
+				if (bandera) continue;
+				/*Pasar de la Lista de palabras clonadas a Lista final de palabras a sugerir*/
+				strcpy_s(szListaFinal[iNumLista], szPalabrasSugeridas[i]);
+				iPeso[iNumLista++] = iEstadisticas[j];
+			}
+		}
+	}
 	
-	iNumLista = 1;							//Una sola palabra candidata
 }
 
 /*****************************************************************************************************************
