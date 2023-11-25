@@ -186,8 +186,23 @@ void	ListaCandidatas		(
 			}
 		}
 	}
-	
+	/*Comprobar con Numero de elementos en la szListaFinal*/
+	//Numero de elementos en la lista de opciones.
+	for (int i = 0; i < iNumLista; i++) {
+		for (int j = 0; j < iNumLista - 1; j++) {
+			/*Asignar la condicion*/
+			if (iPeso[j] < iPeso[j + 1]) {
+				/*Variables para el metodo de las candidatas*/
+				int iaux; char caux[50];
+				strcpy_s(caux, szListaFinal[j + 1]); iaux = iPeso[j + 1];
+				strcpy_s(szListaFinal[j + 1], szListaFinal[j]); iPeso[j + 1] = iPeso[j];
+				strcpy_s(szListaFinal[j], caux); iPeso[j] = iaux;
+			}
+		}
+	}
 }
+	
+
 
 /*****************************************************************************************************************
 	ClonaPalabras: toma una palabra y obtiene todas las combinaciones y permutaciones requeridas por el metodo
