@@ -231,4 +231,11 @@ void	ClonaPalabras(
 			strcpy_s(szPalabrasSugeridas[iNumSugeridas++], aux);
 		} aux[i] = szPalabraLeida[i];
 	}
+	//Pasar el abecedario entre los caracteres
+	int k;
+	for (k = 1; k < strlen(szPalabraLeida) + 1; k++) {
+		aux[k] = szPalabraLeida[k - 1];
+
+		/*Para asignar espacios*/
+	} aux[k] = '\0';
 }
